@@ -1,12 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var Product = require('../models/product');
-var csurf = require('csurf');
-var passport = require('passport');
-var csrfProtection = csurf();
-
-
-router.use(csrfProtection);
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -21,34 +15,5 @@ router.get('/', function(req, res, next) {
 });
 
 
-/*SIGN UP GET page*/
-router.get('/user/signup', function(req, res, next) {
-  var messages = req.flash('error');
-  res.render('user/signup', { csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length > 0 });
-});
-
-/*SIGN UP POST page*/
-router.post('/user/signup', passport.authenticate('local.signup', {
-  successRedirect:'/user/profile',
-  failureRedirect: '/user/signup',
-  failureFlash: true
-}));
-
-router.get('/user/profile', function(req, res, next) { 
-  res.render('user/profile');
-});
-
-/*SIGN UN GET page*/
-router.get('/user/signin', function(req, res, next) {
-  var messages = req.flash('error');
-  res.render('user/signin', { csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length > 0 });
-});
-
-/*SIGN IN POST page*/
-router.post('/user/signin', passport.authenticate('local.signin', {
-  successRedirect:'/user/profile',
-  failureRedirect: '/user/signin',
-  failureFlash: true
-}));
 
 module.exports = router;

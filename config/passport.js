@@ -55,7 +55,7 @@ passport.use('local.signin', new LocalStrategy({
     passReqToCallback: true
 }, function(req, email, password, done) {
     req.checkBody('email', 'Invalid email').notEmpty().isEmail();
-    req.checkBody('password', 'Invalid password').notEmpty().notEmpty();
+    req.checkBody('password', 'Invalid password').notEmpty();
     var errors = req.validationErrors();
     if( errors ) {
         var messages = [];
@@ -68,10 +68,10 @@ passport.use('local.signin', new LocalStrategy({
         if ( err ) {
             return done(err);
         }
-        if ( user ) {
+        if ( !user ) {
             return done(null, false, { message: 'No user found.'});
         }
-        if (!User.validPassword(password)) {
+        if (!user.validPassword(password)) {
             return done(null, false, { message: 'Wrong password.'});
         }
         return done(null, user);
