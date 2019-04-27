@@ -3,6 +3,8 @@ var router = express.Router();
 
 var Cart = require('../models/cart');
 var Product = require('../models/product');
+var Order = require('../models/order');
+
 
 
 /* GET home page. */
@@ -85,15 +87,30 @@ router.post('/checkout', function(req, res, next) {
     currency: "usd",
     source: req.body.stripeToken, // obtained with Stripe.js
     description: "Test Charge"
-    }, function(err, charge) {
+  }, function(err, charge) {
       if (err) {
         req.flash('error', err.message);
         return res.redirect('/checkout');
       }
-      req.flash('success', 'Successfully bought product');
-      req.session.cart = null;
-      res.redirect('/');
+      var order = new Order({
+        user: req.user, // passport hace accesible este user de la derecha
+        cart: cart,
+        address: req.body.address,
+        name: req.body.name,
+        paymentId: charge.id // id de la transaccion en Stripe
+      });
+      order.save(function(err, result) {
+        //se debe manejar el erro
+        //if (err) {
+        //req.flash('error', err.message);
+        //return res.redirect('/checkout');
+        //}
+        req.flash('success', 'Successfully bought product!');
+        req.session.cart = null;
+        res.redirect('/');
+      });
   });
 });
+
 
 module.exports = router;
